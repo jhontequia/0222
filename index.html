@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Para ti...</title>
+    <style>
+        :root {
+            /* Paleta de colores minimalista y oscura */
+            --bg-dark: #0d0b0d;
+            --bg-glow: #2a1a22;
+            --accent: #e5b0b3; /* Tono oro rosa / rosa pálido */
+            --polaroid-bg: #fdfbfb;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: radial-gradient(circle at center, var(--bg-glow) 0%, var(--bg-dark) 100%);
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            text-align: center;
+            overflow: hidden;
+            color: var(--accent);
+        }
+
+        #content-container {
+            width: 100%;
+            max-width: 320px; /* Tamaño ideal para pantallas pequeñas */
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 420px;
+            justify-content: center;
+            position: relative;
+        }
+
+        /* Estilo Polaroid Elegante */
+        .polaroid {
+            background: var(--polaroid-bg);
+            padding: 12px 12px 55px 12px; /* Más espacio abajo para el texto */
+            box-shadow: 0 20px 40px rgba(0,0,0,0.8), 0 0 15px rgba(229, 176, 179, 0.05);
+            border-radius: 3px;
+            display: none;
+            animation: smoothFade 1.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+            margin-bottom: 20px;
+            position: relative;
+            transition: opacity 0.5s ease;
+        }
+
+        .polaroid::after {
+            content: "Feliz Cumpleaños ♥";
+            position: absolute;
+            bottom: 18px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            color: #4a4a4a;
+            font-size: 15px;
+            font-family: 'Georgia', serif;
+            font-style: italic;
+            letter-spacing: 1px;
+        }
+
+        .polaroid img {
+            width: 100%;
+            max-width: 280px;
+            height: auto;
+            border-radius: 2px;
+            object-fit: cover;
+            aspect-ratio: 4/5;
+            filter: contrast(1.05) sepia(0.15); 
+        }
+
+        button {
+            padding: 14px 35px;
+            font-size: 13px;
+            font-weight: 400;
+            border: 1px solid var(--accent);
+            border-radius: 40px;
+            background-color: transparent;
+            color: var(--accent);
+            cursor: pointer;
+            transition: all 0.4s ease;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+        }
+
+        button:hover {
+            background-color: var(--accent);
+            color: var(--bg-dark);
+            box-shadow: 0 0 20px rgba(229, 176, 179, 0.3);
+        }
+
+        button:active {
+            transform: scale(0.96);
+        }
+
+        @keyframes smoothFade {
+            from { 
+                opacity: 0; 
+                transform: translateY(20px) scale(0.95); 
+                filter: blur(2px);
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) scale(1); 
+                filter: blur(0);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="bg-audio">
+        <source src="cancion.mp3" type="audio/mpeg">
+        Tu navegador no soporta el elemento de audio.
+    </audio>
+
+    <div id="content-container">
+        <div class="polaroid" id="polaroid-wrapper">
+            <img id="image-display" src="" alt="Nuestro recuerdo">
+        </div>
+
+        <button id="action-btn">Tocar aquí</button>
+    </div>
+
+    <script>
+        const imagenes = [
+            "1.jpeg", "2.jpeg", "3.jpeg", "4.gif", "5.gif",
+            "6.gif", "7.gif", "8.gif", "9.gif", "10.gif", 
+            "11.gif", "12.gif","13.gif", "14.gif", "15.gif"
+        ];
+        let imgIndex = 0;
+        let slideshowInterval;
+
+        const btn = document.getElementById('action-btn');
+        const polaroidWrapper = document.getElementById('polaroid-wrapper');
+        const imgDisplay = document.getElementById('image-display');
+        const bgAudio = document.getElementById('bg-audio');
+
+        // Función para reiniciar todo cuando termine la canción
+        const reiniciarExperiencia = () => {
+            // Desvanecer la foto
+            polaroidWrapper.style.opacity = '0';
+            
+            setTimeout(() => {
+                polaroidWrapper.style.display = 'none';
+                polaroidWrapper.style.opacity = '1';
+                
+                imgIndex = 0;
+                
+                bgAudio.currentTime = 0;
+                
+                btn.style.display = 'block';
+                setTimeout(() => {
+                    btn.style.opacity = '1';
+                }, 50);
+            }, 500); // Esperar medio segundo para que la transición sea suave
+        };
+
+        bgAudio.addEventListener('ended', reiniciarExperiencia);
+
+        const mostrarSiguienteImagen = () => {
+            polaroidWrapper.style.display = 'block';
+            
+            const rotacion = (Math.random() * 4 - 2).toFixed(1);
+            polaroidWrapper.style.transform = `rotate(${rotacion}deg)`;
+            
+            // Reiniciar animación
+            polaroidWrapper.style.animation = 'none';
+            polaroidWrapper.offsetHeight; 
+            polaroidWrapper.style.animation = 'smoothFade 1.2s cubic-bezier(0.2, 0.8, 0.2, 1)';
+
+            // Cambiar imagen
+            imgDisplay.src = imagenes[imgIndex];
+            
+            // Comprobar si es la última imagen (el GIF 15)
+            if (imgIndex === imagenes.length - 1) {
+                clearInterval(slideshowInterval);
+                
+            } else {
+                imgIndex++;
+            }
+        };
+
+        btn.addEventListener('click', () => {
+            btn.style.opacity = '0';
+            setTimeout(() => btn.style.display = 'none', 400);
+            
+            // Iniciar la música
+            bgAudio.play();
+
+            // Mostrar la primera imagen
+            mostrarSiguienteImagen();
+            
+            // Iniciar el carrusel
+            clearInterval(slideshowInterval);
+            slideshowInterval = setInterval(mostrarSiguienteImagen, 3800);
+        });
+    </script>
+</body>
+</html>
